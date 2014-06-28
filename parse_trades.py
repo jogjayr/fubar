@@ -4,6 +4,15 @@ from datetime import datetime
 from datetime import date
 import csv
 
+def write_portfolio(p_dict, filename):
+    initial_f = open(filename, 'w+')
+    initial_writer = csv.writer(initial_f, delimiter=',', quotechar='"')
+
+    for (k, v) in p_dict.iteritems():
+       initial_writer.writerow((k,v))
+
+    initial_f.close()
+
 strptime = datetime.strptime
 portfolio_file_name = 'Jayraj Portfolio.csv'
 trades_file_name = 'Jayraj_portfolio_trades.csv'
@@ -33,6 +42,7 @@ for trade in trades:
         buy_totals[stock] += int(quantity)
     rownum += 1
 
+
 #build dict of each position in the portfolio
 portfolio_dict = defaultdict(int)
 rownum = 0
@@ -49,17 +59,22 @@ for holding in portfolio:
 for ticker, quantity in buy_totals.iteritems():
     portfolio_dict[ticker] -= quantity
 
-print portfolio_dict
-initial_f = open(portfolio_initial_name, 'w+')
-initial_writer = csv.writer(initial_f, delimiter=',', quotechar='"')
- 
-#import pdb; pdb.set_trace()
-for (k, v) in portfolio_dict.iteritems():
-   initial_writer.writerow((k,v))
+write_portfolio(portfolio_dict, portfolio_initial_name)
 
-initial_f.close()
 
+
+sorted_transactions = sorted(transactions, key=lambda k: k['date'])
 
 #for each trade, create a snapshot of the portfolio
+for trade in sorted_transactions:
+    ticker = trade['stock']
+    portfolio_dict[ticker] += trade['quantity']
+    portfolio_snapshot_name = 'portfolio' + str(trade['date']) + '.csv'
+    write_portfolio(portfolio_dict, portfolio_snapshot_name)
 
+
+
+
+f_portfolio.close()
+f_trades.close()
 
