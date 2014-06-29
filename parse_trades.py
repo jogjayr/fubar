@@ -13,7 +13,10 @@ def write_portfolio(p_dict, filename):
 
     initial_f.close()
 
+date_format = '%d-%b-%Y'
+
 strptime = datetime.strptime
+
 portfolio_file_name = 'Jayraj Portfolio.csv'
 trades_file_name = 'Jayraj_portfolio_trades.csv'
 portfolio_initial_name = 'Jayraj_portfolio_initial.csv'
@@ -38,7 +41,7 @@ for trade in trades:
         stock = trade[1]
         quantity = trade[3]
         date = trade[0]
-        transactions.append({'stock': stock, 'quantity': int(quantity), 'date': strptime(date, '%d-%b-%Y')})
+        transactions.append({'stock': stock, 'quantity': int(quantity), 'date': strptime(date,  date_format)})
         buy_totals[stock] += int(quantity)
     rownum += 1
 
@@ -69,7 +72,7 @@ sorted_transactions = sorted(transactions, key=lambda k: k['date'])
 for trade in sorted_transactions:
     ticker = trade['stock']
     portfolio_dict[ticker] += trade['quantity']
-    portfolio_snapshot_name = 'portfolio' + str(trade['date']) + '.csv'
+    portfolio_snapshot_name = 'portfolio-' + trade['date'].strftime(date_format) + '.csv'
     write_portfolio(portfolio_dict, portfolio_snapshot_name)
 
 
