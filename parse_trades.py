@@ -118,8 +118,6 @@ portfolio_snapshot_dates = sorted([strptime(k, date_format) for k in portfolios_
 
 year_start = date
 
-# prices_by_date = import_prices(portfolio_dict.keys())
-# print portfolio_snapshot_dates
 
 single_day = timedelta(days=1)
 start_date = strptime('02-Jan-2013', date_format)
@@ -134,24 +132,30 @@ current_portfolio = portfolios_by_date[current_portfolio_date.strftime(date_form
 
 prices_by_day = import_prices(portfolio_dict.keys())
 
-import pdb; pdb.set_trace()
+
 all_values = []
 while d <= end_date:
     if d > next_portfolio_date:
         next_portfolio_date_index += 1
-        if next_portfolio_date_index < len(portfolio_snapshot_dates) - 1:
+        if next_portfolio_date_index < len(portfolio_snapshot_dates):
             current_portfolio_date_index = next_portfolio_date_index - 1
             current_portfolio_date = portfolio_snapshot_dates[current_portfolio_date_index]
             current_portfolio = portfolios_by_date[current_portfolio_date.strftime(date_format)]
             next_portfolio_date = portfolio_snapshot_dates[next_portfolio_date_index]
+            print "current date: %s nextdate: %s" % (current_portfolio_date.strftime(date_format), next_portfolio_date.strftime(date_format))
+        elif next_portfolio_date_index == len(portfolio_snapshot_dates):
+            current_portfolio_date = next_portfolio_date
+            current_portfolio = portfolios_by_date[current_portfolio_date.strftime(date_format)]
     value_on_date = calculate_portfolio_value(current_portfolio, d)
     all_values.append({"date": d.strftime(date_format), "value": value_on_date})
-    print "Date: %s Portfolio High: %s" % (d.strftime("%Y-%m-%d"), value_on_date )
     d += single_day
 
 
 sorted_values = sorted(all_values, key = lambda k: k['value'] )
-print sorted_values
+# sorted_values = all_values
+
+for item in sorted_values:
+    print "Date: %s High: %s" % (item['date'], item['value']) 
 
 f_portfolio.close()
 f_trades.close()
