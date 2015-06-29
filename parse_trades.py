@@ -20,16 +20,21 @@ def strtofloat(string):
     return float(string.replace(',', ''))
 
 
-#return
 def import_prices(tickers):
     prices = {}
+    strptime = datetime.strptime
+    google_date_format = '%b %d, %Y'
+    date_format = '%d-%b-%Y'
+
     for ticker in tickers:
-        file_handle = open(ticker + '.csv', 'r')
+        file_handle = open('2014/%s.csv' % ticker, 'r')
         file_csv_handle = csv.reader(file_handle, delimiter=',')
         for row in file_csv_handle:
-            date_key = strptime(row[0], google_date_format).strftime(date_format)
+            date_key = strptime(row[3], google_date_format).strftime(date_format)
             prices.setdefault(date_key, {})
-            prices[date_key][ticker] = {'high': strtofloat(row[2]), 'low': strtofloat(row[3]), 'open': strtofloat(row[1]), 'close': strtofloat(row[4])}
+            prices[date_key][ticker] = {
+                'high': strtofloat(row[1])
+            }
 
         file_handle.close()
     return prices
@@ -45,117 +50,120 @@ def calculate_portfolio_value(portfolio, date):
         high += prices_on_day[ticker]['high'] * quantity
     return high
 
-date_format = '%d-%b-%Y'
-google_date_format = '%b %d, %Y'
 
-strptime = datetime.strptime
+def import_portfolio(fname):
+    portfolio_dict = defaultdict(int)
+    with open(fname) as fd:
+        portfolio = csv.reader(fd)
 
+        for holding in portfolio:
+            if not holding:
+                continue
 
-portfolio_file_name = 'Jayraj Portfolio.csv'
-trades_file_name = 'Jayraj_portfolio_trades.csv'
-portfolio_initial_name = 'Jayraj_portfolio_initial.csv'
+            stock = holding[0]
+            quantity = int(holding[1])
+            portfolio_dict[stock] += quantity
+    return portfolio_dict
 
+if __name__ == '__main__':
+    date_format = '%d-%b-%Y'
+    google_date_format = '%b %d, %Y'
 
-f_portfolio = open(portfolio_file_name)
-f_trades = open(trades_file_name)
+    strptime = datetime.strptime
 
-portfolio = csv.reader(f_portfolio)
-trades = csv.reader(f_trades)
+    portfolio_file_name = 'Jayraj_portfolio.csv'
+    trades_file_name = 'Jayraj_portfolio_trades.csv'
+    portfolio_initial_name = 'Jayraj_portfolio_initial.csv'
 
-#establish portfolio state before all the trades
+    f_portfolio = open(portfolio_file_name)
+    f_trades = open(trades_file_name)
 
-#find total buys of each security
-transactions = []
-buy_totals = defaultdict(int)
-rownum, colnum = 0, 0
+    trades = csv.reader(f_trades)
 
-for trade in trades:
-    if not trade:
-        continue
-    if rownum > 0:
-        stock = trade[1]
-        quantity = trade[3]
-        date = trade[0]
-        transactions.append({'stock': stock, 'quantity': int(quantity), 'date': strptime(date,  date_format)})
-        buy_totals[stock] += int(quantity)
-    rownum += 1
+    #establish portfolio state before all the trades
 
+    #find total buys of each security
+    transactions = []
+    buy_totals = defaultdict(int)
+    rownum, colnum = 0, 0
 
-#build dict of each position in the portfolio
-portfolio_dict = defaultdict(int)
-rownum = 0
-for holding in portfolio:
-    if not holding:
-        continue
-    if rownum > 0:
-        stock = holding[0]
-        quantity = int(holding[1])
-        portfolio_dict[stock] += quantity
-    rownum += 1
+    for trade in trades:
+        if not trade:
+            continue
+        if rownum > 0:
+            stock = trade[1]
+            quantity = trade[3]
+            date = trade[0]
+            transactions.append({'stock': stock, 'quantity': int(quantity), 'date': strptime(date,  date_format)})
+            buy_totals[stock] += int(quantity)
+        rownum += 1
 
-#output portfolio at start of the year
-for ticker, quantity in buy_totals.iteritems():
-    portfolio_dict[ticker] -= quantity
+    portfolio_dict = import_portfolio(portfolio_file_name)
 
-write_portfolio(portfolio_dict, portfolio_initial_name)
+    #output portfolio at start of the year
+    for ticker, quantity in buy_totals.iteritems():
+        portfolio_dict[ticker] -= quantity
 
-sorted_transactions = sorted(transactions, key=lambda k: k['date'])
+    write_portfolio(portfolio_dict, portfolio_initial_name)
 
-portfolios_by_date = {'02-Jan-2013': copy.deepcopy(portfolio_dict)}
+    sorted_transactions = sorted(transactions, key=lambda k: k['date'])
 
-#for each trade, create a snapshot of the portfolio
-for trade in sorted_transactions:
-    ticker = trade['stock']
-    portfolio_dict[ticker] += trade['quantity']
-    portfolio_snapshot_name = 'portfolio-' + trade['date'].strftime(date_format) + '.csv'
+    portfolios_by_date = {'02-Jan-2013': copy.deepcopy(portfolio_dict)}
 
-    #contains the state of the portfolio in a dict, keyed by date
-    portfolios_by_date[trade['date'].strftime(date_format)] = copy.deepcopy(portfolio_dict)
-    write_portfolio(portfolio_dict, portfolio_snapshot_name)
+    #for each trade, create a snapshot of the portfolio
+    for trade in sorted_transactions:
+        ticker = trade['stock']
+        portfolio_dict[ticker] += trade['quantity']
+        portfolio_snapshot_name = 'portfolio-' + trade['date'].strftime(date_format) + '.csv'
 
-
-portfolio_snapshot_dates = sorted([strptime(k, date_format) for k in portfolios_by_date.keys()])
-
-year_start = date
+        #contains the state of the portfolio in a dict, keyed by date
+        portfolios_by_date[trade['date'].strftime(date_format)] = copy.deepcopy(portfolio_dict)
+        write_portfolio(portfolio_dict, portfolio_snapshot_name)
 
 
-single_day = timedelta(days=1)
-start_date = strptime('02-Jan-2014', date_format)
-end_date = strptime('31-Dec-2014', date_format)
+    portfolio_snapshot_dates = sorted([strptime(k, date_format) for k in portfolios_by_date.keys()])
 
-d = start_date
-next_portfolio_date_index = 1
-next_portfolio_date = portfolio_snapshot_dates[next_portfolio_date_index]
-current_portfolio_date_index = next_portfolio_date_index - 1
-current_portfolio_date = portfolio_snapshot_dates[current_portfolio_date_index]
-current_portfolio = portfolios_by_date[current_portfolio_date.strftime(date_format)]
-
-prices_by_day = import_prices(portfolio_dict.keys())
+    year_start = date
 
 
-all_values = []
-while d <= end_date:
-    if d > next_portfolio_date:
-        next_portfolio_date_index += 1
-        if next_portfolio_date_index < len(portfolio_snapshot_dates):
-            current_portfolio_date_index = next_portfolio_date_index - 1
-            current_portfolio_date = portfolio_snapshot_dates[current_portfolio_date_index]
-            current_portfolio = portfolios_by_date[current_portfolio_date.strftime(date_format)]
-            next_portfolio_date = portfolio_snapshot_dates[next_portfolio_date_index]
-            print "current date: %s nextdate: %s" % (current_portfolio_date.strftime(date_format), next_portfolio_date.strftime(date_format))
-        elif next_portfolio_date_index == len(portfolio_snapshot_dates):
-            current_portfolio_date = next_portfolio_date
-            current_portfolio = portfolios_by_date[current_portfolio_date.strftime(date_format)]
-    value_on_date = calculate_portfolio_value(current_portfolio, d)
-    all_values.append({"date": d.strftime(date_format), "value": value_on_date})
-    d += single_day
+    single_day = timedelta(days=1)
+    start_date = strptime('02-Jan-2014', date_format)
+    end_date = strptime('31-Dec-2014', date_format)
+
+    d = start_date
+    next_portfolio_date_index = 1
+    next_portfolio_date = portfolio_snapshot_dates[next_portfolio_date_index]
+    current_portfolio_date_index = next_portfolio_date_index - 1
+    current_portfolio_date = portfolio_snapshot_dates[current_portfolio_date_index]
+    current_portfolio = portfolios_by_date[current_portfolio_date.strftime(date_format)]
+
+    prices_by_day = import_prices(portfolio_dict.keys())
 
 
-sorted_values = sorted(all_values, key=lambda k: k['value'])
-# sorted_values = all_values
+    all_values = []
+    while d <= end_date:
+        if d > next_portfolio_date:
+            next_portfolio_date_index += 1
+            if next_portfolio_date_index < len(portfolio_snapshot_dates):
+                current_portfolio_date_index = next_portfolio_date_index - 1
+                current_portfolio_date = portfolio_snapshot_dates[current_portfolio_date_index]
+                current_portfolio = portfolios_by_date[current_portfolio_date.strftime(date_format)]
+                next_portfolio_date = portfolio_snapshot_dates[next_portfolio_date_index]
+                print "current date: %s nextdate: %s" % (current_portfolio_date.strftime(date_format), next_portfolio_date.strftime(date_format))
+            elif next_portfolio_date_index == len(portfolio_snapshot_dates):
+                current_portfolio_date = next_portfolio_date
+                current_portfolio = portfolios_by_date[current_portfolio_date.strftime(date_format)]
+        value_on_date = calculate_portfolio_value(current_portfolio, d)
+        all_values.append({"date": d.strftime(date_format), "value": value_on_date})
+        d += single_day
 
-for item in sorted_values:
-    print "Date: %s High: %s" % (item['date'], item['value'])
 
-f_portfolio.close()
-f_trades.close()
+    sorted_values = sorted(all_values, key=lambda k: k['value'])
+    # sorted_values = all_values
+
+    for item in sorted_values:
+        print "Date: %s High: %s" % (item['date'], item['value'])
+
+    f_portfolio.close()
+    f_trades.close()
+

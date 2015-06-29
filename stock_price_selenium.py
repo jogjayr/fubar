@@ -4,6 +4,7 @@
 from selenium import webdriver
 import json
 from urllib import quote
+import time
 
 
 class StockPriceSelenium(object):
@@ -25,142 +26,85 @@ class StockPriceSelenium(object):
                          % self.ticker)
 
     def test_stock_price_selenium(self, ticker_name, page=1):
+        SLEEP_TIME = 0.5
         driver = self.driver
         google_url = self._get_goog_url(page)
         driver.get(self.base_url + google_url)
 
-        # ERROR: Caught exception [ERROR: Unsupported command [waitForPopUp | _self | 30000]]
-
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName'
-                                  ).send_keys('date')
-        driver.find_element_by_css_selector('td.lm').click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_css_selector('a.kim-new-datatype'
-                                            ).click()
-        driver.find_element_by_id('kim-ToolbarDataName').click()
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName'
-                                  ).send_keys('open')
-        driver.find_element_by_css_selector('td.rgt').click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_css_selector('a.kim-new-datatype'
-                                            ).click()
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName'
-                                  ).send_keys('high')
-        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[3]"
-                                     ).click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_css_selector('a.kim-new-datatype'
-                                            ).click()
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName').send_keys('low')
-        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[4]"
-                                     ).click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_css_selector('a.kim-new-datatype'
-                                            ).click()
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName'
-                                  ).send_keys('close')
-        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[5]"
-                                     ).click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_css_selector('a.kim-new-datatype'
-                                            ).click()
-        driver.find_element_by_id('kim-ToolbarDataName').click()
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName'
-                                  ).send_keys('volume')
-        driver.find_element_by_css_selector('td.rgt.rm').click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_css_selector('div.SP_arrow_next').click()
-        driver.find_element_by_id('kim-DoneButton').click()
-        driver.find_element_by_id('kim-APIName').clear()
-        driver.find_element_by_id('kim-APIName').send_keys('CARE-2')
+        driver.find_element_by_id("kim-ToolbarDataName").clear()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").send_keys("date")
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("td.lm").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[1]").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("[kimonotier= '1'] a.kim-highlight-button.kim-accept-highlight:first-of-type").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("a.kim-new-datatype").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").clear()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").send_keys("open")
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("td.rgt").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[2]").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("[kimonotier= '1'] a.kim-highlight-button.kim-accept-highlight:first-of-type").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("a.kim-new-datatype").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").clear()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").send_keys("high")
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[3]").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("[kimonotier= '1'] a.kim-highlight-button.kim-accept-highlight:first-of-type").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("a.kim-new-datatype").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").clear()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").send_keys("low")
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[4]").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("[kimonotier= '1'] a.kim-highlight-button.kim-accept-highlight:first-of-type").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("a.kim-new-datatype").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").clear()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").send_keys("close")
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[5]").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("[kimonotier= '1'] a.kim-highlight-button.kim-accept-highlight:first-of-type").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("a.kim-new-datatype").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").clear()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-ToolbarDataName").send_keys("volume")
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[6]").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_css_selector("[kimonotier= '1'] a.kim-highlight-button.kim-accept-highlight:first-of-type").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-DoneButton").click()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-APIName").clear()
+        time.sleep(SLEEP_TIME)
+        driver.find_element_by_id("kim-APIName").send_keys("%s-%s" % (ticker_name, page))
+        time.sleep(SLEEP_TIME)
         driver.find_element_by_xpath("//input[@value='Create API']"
                                      ).click()
+        time.sleep(SLEEP_TIME)
         driver.find_element_by_xpath("//div[@id='kim-Large-Overlay']/button"
                                      ).click()
-
-        # ERROR: Caught exception [ERROR: Unsupported command [waitForPopUp | _self | 30000]]
-
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName'
-                                  ).send_keys('date')
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a[2]"
-                                     ).click()
-        driver.find_element_by_id('kim-ToolbarDataName').click()
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName'
-                                  ).send_keys('open')
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a[3]"
-                                     ).click()
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName'
-                                  ).send_keys('high')
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a[4]"
-                                     ).click()
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName').send_keys('low')
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a[5]"
-                                     ).click()
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName'
-                                  ).send_keys('close')
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a[6]"
-                                     ).click()
-        driver.find_element_by_id('kim-ToolbarDataName').clear()
-        driver.find_element_by_id('kim-ToolbarDataName'
-                                  ).send_keys('volume')
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a/span"
-                                     ).click()
-        driver.find_element_by_css_selector('td.lm').click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a[2]/span"
-                                     ).click()
-        driver.find_element_by_css_selector('td.rgt').click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a[3]/span"
-                                     ).click()
-        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[3]"
-                                     ).click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a[4]/span"
-                                     ).click()
-        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[4]"
-                                     ).click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a[5]/span"
-                                     ).click()
-        driver.find_element_by_xpath("//table[@id='kim-normalized-table-3']/tbody/tr[2]/td[5]"
-                                     ).click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_xpath("//div[@id='kim-Toolbar']/div[3]/a[6]/span"
-                                     ).click()
-        driver.find_element_by_css_selector('td.rgt.rm').click()
-        driver.find_element_by_css_selector('a.kim-highlight-button.kim-accept-highlight'
-                                            ).click()
-        driver.find_element_by_id('kim-DoneButton').click()
-        driver.find_element_by_id('kim-APIName').clear()
-        driver.find_element_by_id('kim-APIName').send_keys('%s-%s' % (ticker_name, page))
-        driver.find_element_by_xpath("//input[@value='Create API']"
-                                     ).click()
-        driver.find_element_by_xpath("//div[@id='kim-Large-Overlay']/button"
-                                     ).click()
-
+        time.sleep(20)
 
 if __name__ == '__main__':
     with open('bom.json') as fd:
